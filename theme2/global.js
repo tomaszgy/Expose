@@ -244,3 +244,52 @@ function findoverlap(elem)
 	var overlap = (Math.min(elemBottom, docViewBottom) - Math.max(elemTop, docViewTop));
 	return overlap/(winHeight);
 }
+
+
+$(document).ready(function(){
+    let currentImageIndex = -1;
+    let images = $('.image');
+
+    function openFullscreen(index) {
+        if (index < 0 || index >= images.length) return;
+        currentImageIndex = index;
+        
+        let imgElement = $(images[index]).find('img').clone();
+        $('#fullscreen').empty().addClass('active').append(imgElement);
+        
+        let img = $('#fullscreen img');
+        let imgwidth = img.prop('width');
+        let imgheight = img.prop('height');
+        let screenwidth = $(window).width();
+        let screenheight = $(window).height();
+
+        if (imgwidth / imgheight > screenwidth / screenheight) {
+            img.css({ width: '100%', height: 'auto', 'margin-top': (0.5 * (screenheight - img.height())) + 'px' });
+        } else {
+            img.css({ height: '100%', width: 'auto' });
+        }
+    }
+
+    $('.image').not('.index1, .fullwidth').click(function(){
+        let index = images.index(this);
+        openFullscreen(index);
+        return false;
+    });
+
+    $('#fullscreen').click(function(){
+        $('#fullscreen').empty().removeClass('active');
+        currentImageIndex = -1;
+    });
+
+    $(document).keydown(function(e) {
+        if ($('#fullscreen').hasClass('active')) {
+            if (e.key === 'ArrowRight') {
+                openFullscreen(currentImageIndex + 1);
+            } else if (e.key === 'ArrowLeft') {
+                openFullscreen(currentImageIndex - 1);
+            } else if (e.key === 'Escape') {
+                $('#fullscreen').click();
+            }
+        }
+    });
+});
